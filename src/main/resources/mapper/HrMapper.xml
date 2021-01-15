@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.kuro.vhr.mapper.HrMapper">
+
+    <resultMap id="BaseMap" type="org.kuro.vhr.model.entity.Hr">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="phone" property="phone" jdbcType="CHAR"/>
+        <result column="telephone" property="telephone" jdbcType="VARCHAR"/>
+        <result column="address" property="address" jdbcType="VARCHAR"/>
+        <result column="enabled" property="enabled" jdbcType="BIT"/>
+        <result column="username" property="username" jdbcType="VARCHAR"/>
+        <result column="password" property="password" jdbcType="VARCHAR"/>
+        <result column="userface" property="userface" jdbcType="VARCHAR"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap id="HrWithRoles" type="org.kuro.vhr.model.entity.Hr" extends="BaseMap">
+        <collection property="roles" ofType="org.kuro.vhr.model.entity.Role">
+            <id column="rid" property="id"/>
+            <result column="rname" property="name"/>
+            <result column="rnameZh" property="nameZh"/>
+        </collection>
+    </resultMap>
+
+    <select id="loadUserByUsername" resultType="org.kuro.vhr.model.entity.Hr">
+        select *
+        from hr
+        where username = #{username}
+    </select>
+
+    <select id="getHrRolesById" resultType="org.kuro.vhr.model.entity.Role">
+        select r.*
+        from role r,
+             hr_role hrr
+        where hrr.`rid` = r.`id`
+          and hrr.`hrid` = #{id}
+    </select>
+
+    <select id="getAllHrs" resultMap="HrWithRoles">
+        select hr.id,
+        hr.name,
+        hr.phone,
+        hr.telephone,
+        hr.address,
+        hr.enabled,
+        hr.username,
+        hr.userface,
+        hr.remark,
+        r.`id` as rid,
+        r.`name` as rname,
+        r.`name_zh` as rnameZh
+        from hr
+        left join hr_role hrr on
+        hr.`id` = hrr.`hrid`
+        left join role r on hrr.`rid` = r.`id`
+        where hr.`id` != #{hrid}
+        <if test="keywords!=null">
+            and hr.name like concat('%',#{keywords},'%')
+        </if>
+        order by hr.id
+    </select>
+
+    <update id="updateByPrimaryKeySelective" parameterType="org.kuro.vhr.model.entity.Hr">
+        update hr
+        <set>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                phone = #{phone,jdbcType=CHAR},
+            </if>
+            <if test="telephone != null">
+                telephone = #{telephone,jdbcType=VARCHAR},
+            </if>
+            <if test="address != null">
+                address = #{address,jdbcType=VARCHAR},
+            </if>
+            <if test="enabled != null">
+                enabled = #{enabled,jdbcType=BIT},
+            </if>
+            <if test="username != null">
+                username = #{username,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                password = #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="userface != null">
+                userface = #{userface,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+</mapper>

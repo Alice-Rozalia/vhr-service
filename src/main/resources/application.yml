@@ -1,0 +1,22 @@
+server:
+  port: 8360
+  compression:
+    enabled: true # 开启gzip压缩
+
+#========================== 数据库相关 ==============================
+spring:
+  application:
+    name: vhr
+  datasource:
+    url: jdbc:mysql:///vhr?serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.jdbc.Driver
+
+#============================= Mybatis ==================================
+mybatis:
+  type-aliases-package: org.blog.model.*
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 开启控制台打印 sql
+    map-underscore-to-camel-case: true                    # 下划线转驼峰配置
+  mapper-locations: classpath:mapper/*.xml                # 配置扫描

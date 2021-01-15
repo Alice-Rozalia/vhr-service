@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.kuro.vhr.mapper.EmployeeMapper">
+
+    <resultMap id="BaseResultMap" type="org.kuro.vhr.model.entity.Employee">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="gender" property="gender" jdbcType="CHAR"/>
+        <result column="birthday" property="birthday" jdbcType="DATE"/>
+        <result column="id_card" property="idCard" jdbcType="CHAR"/>
+        <result column="wedlock" property="wedlock" jdbcType="CHAR"/>
+        <result column="nation_id" property="nationId" jdbcType="INTEGER"/>
+        <result column="native_place" property="nativePlace" jdbcType="VARCHAR"/>
+        <result column="politic_id" property="politicId" jdbcType="INTEGER"/>
+        <result column="email" property="email" jdbcType="VARCHAR"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="address" property="address" jdbcType="VARCHAR"/>
+        <result column="department_id" property="departmentId" jdbcType="INTEGER"/>
+        <result column="job_level_id" property="jobLevelId" jdbcType="INTEGER"/>
+        <result column="pos_id" property="posId" jdbcType="INTEGER"/>
+        <result column="engage_form" property="engageForm" jdbcType="VARCHAR"/>
+        <result column="tiptop_degree" property="tiptopDegree" jdbcType="CHAR"/>
+        <result column="specialty" property="specialty" jdbcType="VARCHAR"/>
+        <result column="school" property="school" jdbcType="VARCHAR"/>
+        <result column="begin_date" property="beginDate" jdbcType="DATE"/>
+        <result column="work_state" property="workState" jdbcType="CHAR"/>
+        <result column="work_id" property="workId" jdbcType="CHAR"/>
+        <result column="contract_term" property="contractTerm" jdbcType="DOUBLE"/>
+        <result column="conversion_time" property="conversionTime" jdbcType="DATE"/>
+        <result column="not_work_date" property="notWorkDate" jdbcType="DATE"/>
+        <result column="begin_contract" property="beginContract" jdbcType="DATE"/>
+        <result column="end_contract" property="endContract" jdbcType="DATE"/>
+        <result column="work_age" property="workAge" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <resultMap id="AllEmployeeInfo" type="org.kuro.vhr.model.entity.Employee" extends="BaseResultMap">
+        <association property="nation" javaType="org.kuro.vhr.model.entity.Nation">
+            <id column="nid" property="id"/>
+            <result column="nname" property="name"/>
+        </association>
+        <association property="politicsstatus" javaType="org.kuro.vhr.model.entity.Politicsstatus">
+            <id column="pid" property="id"/>
+            <result column="pname" property="name"/>
+        </association>
+        <association property="department" javaType="org.kuro.vhr.model.entity.Department">
+            <id column="did" property="id"/>
+            <result column="dname" property="name"/>
+        </association>
+        <association property="jobLevel" javaType="org.kuro.vhr.model.entity.JobLevel">
+            <id column="jid" property="id"/>
+            <result column="jname" property="name"/>
+        </association>
+        <association property="position" javaType="org.kuro.vhr.model.entity.Position">
+            <id column="posid" property="id"/>
+            <result column="posname" property="name"/>
+        </association>
+    </resultMap>
+
+    <select id="getEmployeeByPage" resultMap="AllEmployeeInfo">
+        select e.*,
+        p.`id` as pid,
+        p.`name` as pname,
+        n.`id` as nid,
+        n.`name` as nname,
+        d.`id` as did,
+        d.`name` as dname,
+        j.`id` as jid,
+        j.`name` as jname,
+        pos.`id` as posid,
+        pos.`name` as posname
+        from employee e,
+        nation n,
+        politicsstatus p,
+        department d,
+        job_level j,
+        position pos
+        where e.`nation_id` = n.`id`
+        and e.`politic_id` = p.`id`
+        and e.`department_id` = d.`id`
+        and e.`job_level_id` = j.`id`
+        and e.`pos_id` = pos.`id`
+        <if test="key != null and key != ''">
+            and e.name like concat('%', #{key}, '%')
+        </if>
+        limit #{page},#{limit}
+    </select>
+
+    <select id="getTotal" resultType="java.lang.Long">
+        select count(*) from employee
+        <if test="key != null and key != ''">
+            where `name` like concat('%', #{key}, '%')
+        </if>
+    </select>
+
+</mapper>
