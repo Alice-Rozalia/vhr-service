@@ -36,9 +36,23 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Result addEmp(Employee employee) {
+        employee.setWorkState("在职");
         if (employeeMapper.insertSelective(employee) == 1) {
             return Result.ok(ResultCode.ADD_SUCCESS);
         }
         return Result.ok(ResultCode.ADD_ERROR);
+    }
+
+    @Override
+    public Integer maxWorkId() {
+        return employeeMapper.maxWorkId();
+    }
+
+    @Override
+    public Result deleteEmpById(Integer id) {
+        if (employeeMapper.deleteByPrimaryKey(id) == 1) {
+            return Result.ok(ResultCode.DELETE_SUCCESS);
+        }
+        return Result.ok(ResultCode.DELETE_ERROR);
     }
 }

@@ -82,7 +82,10 @@
         <if test="key != null and key != ''">
             and e.name like concat('%', #{key}, '%')
         </if>
-        limit #{page},#{limit}
+        order by e.work_id
+        <if test="page != null and limit != null">
+            limit #{page},#{limit}
+        </if>
     </select>
 
     <select id="getTotal" resultType="java.lang.Long">
@@ -90,6 +93,11 @@
         <if test="key != null and key != ''">
             where `name` like concat('%', #{key}, '%')
         </if>
+    </select>
+
+    <select id="maxWorkId" resultType="java.lang.Integer">
+        select max(work_id)
+        from employee
     </select>
 
 </mapper>

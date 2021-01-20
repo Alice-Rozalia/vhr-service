@@ -13,4 +13,8 @@ public interface EmployeeService {
     PageResult<Employee> getEmployeeByPage(Integer page, Integer limit, String key);
 
     Result addEmp(Employee employee);
+
+    Integer maxWorkId();
+
+    Result deleteEmpById(Integer id);
 }

@@ -17,4 +17,5 @@ public interface EmployeeMapper extends Mapper<Employee> {
 
     Long getTotal(@Param("key") String key);
 
+    Integer maxWorkId();
 }
