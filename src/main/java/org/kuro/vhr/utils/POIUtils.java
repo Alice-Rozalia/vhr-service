@@ -6,8 +6,13 @@ import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.kuro.vhr.model.entity.Employee;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -44,6 +49,9 @@ public class POIUtils {
         HSSFCellStyle headerStyle = workbook.createCellStyle();
         headerStyle.setFillForegroundColor(IndexedColors.BLUE1.index);
         headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+        HSSFCellStyle dateCellStyle = workbook.createCellStyle();
+        dateCellStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("m/d/yy"));
 
         HSSFSheet sheet = workbook.createSheet("员工信息表");
 
@@ -165,10 +173,6 @@ public class POIUtils {
         c21.setCellStyle(headerStyle);
         c21.setCellValue("合同终止时间");
 
-        HSSFCell c22 = r0.createCell(22);
-        c22.setCellStyle(headerStyle);
-        c22.setCellValue("合同期限（年）");
-
         HSSFCell c23 = r0.createCell(23);
         c23.setCellStyle(headerStyle);
         c23.setCellValue("毕业学校");
@@ -189,29 +193,55 @@ public class POIUtils {
             row.createCell(2).setCellValue(emp.getWorkId());
             row.createCell(3).setCellValue(emp.getWorkState());
             row.createCell(4).setCellValue(emp.getGender());
-            row.createCell(5).setCellValue(emp.getBirthday());
+
+            HSSFCell cell5 = row.createCell(5);
+            cell5.setCellStyle(dateCellStyle);
+            cell5.setCellValue(emp.getBirthday());
+
             row.createCell(6).setCellValue(emp.getIdCard());
-//            row.createCell(7).setCellValue();
-//            row.createCell(8).setCellValue();
-//            row.createCell(9).setCellValue();
-//            row.createCell(10).setCellValue();
-//            row.createCell(11).setCellValue();
-//            row.createCell(12).setCellValue();
-//            row.createCell(13).setCellValue();
-//            row.createCell(14).setCellValue();
-//            row.createCell(15).setCellValue();
-//            row.createCell(16).setCellValue();
-//            row.createCell(17).setCellValue();
-//            row.createCell(18).setCellValue();
-//            row.createCell(19).setCellValue();
-//            row.createCell(20).setCellValue();
-//            row.createCell(21).setCellValue();
-//            row.createCell(22).setCellValue();
-//            row.createCell(23).setCellValue();
-//            row.createCell(24).setCellValue();
-//            row.createCell(25).setCellValue();
+            row.createCell(7).setCellValue(emp.getWedlock());
+            row.createCell(8).setCellValue(emp.getNation().getName());
+            row.createCell(9).setCellValue(emp.getNativePlace());
+            row.createCell(10).setCellValue(emp.getPosition().getName());
+            row.createCell(11).setCellValue(emp.getEmail());
+            row.createCell(12).setCellValue(emp.getPhone());
+            row.createCell(13).setCellValue(emp.getAddress());
+            row.createCell(14).setCellValue(emp.getDepartment().getName());
+            row.createCell(15).setCellValue(emp.getJobLevel().getName());
+            row.createCell(16).setCellValue(emp.getPoliticsstatus().getName());
+            row.createCell(17).setCellValue(emp.getEngageForm());
+
+            HSSFCell cell18 = row.createCell(18);
+            cell18.setCellStyle(dateCellStyle);
+            cell18.setCellValue(emp.getBeginDate());
+
+            HSSFCell cell19 = row.createCell(19);
+            cell19.setCellStyle(dateCellStyle);
+            cell19.setCellValue(emp.getConversionTime());
+
+            HSSFCell cell20 = row.createCell(20);
+            cell20.setCellStyle(dateCellStyle);
+            cell20.setCellValue(emp.getBeginContract());
+
+            HSSFCell cell21 = row.createCell(21);
+            cell21.setCellStyle(dateCellStyle);
+            cell21.setCellValue(emp.getEndContract());
+
+            row.createCell(23).setCellValue(emp.getSchool());
+            row.createCell(24).setCellValue(emp.getSpecialty());
+            row.createCell(25).setCellValue(emp.getTiptopDegree());
         }
-        return null;
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        HttpHeaders headers = new HttpHeaders();
+        try {
+            headers.setContentDispositionFormData("attachment", new String("员工表.xls".getBytes("UTF-8"), "ISO-8859-1"));
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            workbook.write(baos);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<byte[]>(baos.toByteArray(), headers, HttpStatus.CREATED);
     }
 
 }
